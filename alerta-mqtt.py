@@ -23,7 +23,7 @@ import os
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
-from alertaclient.api import Client
+import alertaclient
 
 
 
@@ -42,15 +42,17 @@ logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S',
                     format='%(asctime)-15s [%(levelname)s] %(module)s: %(message)s' )
 config = yaml.load(open("config.yaml"), Loader=yaml.CLoader)
 
-print (config.topics)
 client = mqtt.Client()
 
 client.connect(MQTT_HOST, 1883, 60)
 
 def on_connect(client, userdata, flags, rc):
     logging.info("Connected to MQTT broker with result code "+str(rc))
+    logging.info(config["topics"].keys())
+    for key in config["topics"].keys():
+      logging.info("Subscribing to %s " % (key))
+      client.subscribe(key)
 
-    client.subscribe(MQTT_TOPIC)
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):

@@ -1,3 +1,5 @@
 topics:
-  test:
-    hi: fsdf
+  tele/son_tv/SENSOR:
+    tags:
+      source: sonoffs
+    severity: low
