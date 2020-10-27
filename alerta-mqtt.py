@@ -12,7 +12,7 @@ import paho.mqtt.publish as publish
 
 from alertaclient.api import Client
 
-from matcher_factory import MatcherFactory
+from listener_factory import ListenerFactory
 
 
 # ALERTA_ENDPOINT = os.getenv('ALERTA_ENDPOINT') if os.getenv('ALERTA_ENDPOINT') else "tower.local"
@@ -37,16 +37,16 @@ mqttClient.connect(MQTT_HOST, 1883, 60)
 
 alertaClient = Client()
 
-matchers = []
-factory = MatcherFactory()
+topics = []
+factory = ListenerFactory()
 for topic, config in config["topics"].items():
-  logging.info( "Creating matcher: " + str(config))
-  matchers.append( factory.create(topic, config) )
+  logging.info( "Creating listener: " + str(config))
+  topics.append( factory.create(topic, config) )
 
 def on_connect(client, userdata, flags, rc):
     logging.info("Connected to MQTT broker with result code "+str(rc))
 
-    for topic in matchers:
+    for topic in topics:
       logging.info("Subscribing to %s " % (topic.topic))
       mqttClient.subscribe(topic.topic)
 
@@ -57,9 +57,13 @@ def on_message(client, userdata, msg):
     payload = msg.payload
     logging.info("Message on %s : %s" % (topic, payload))
 
-    for m in matchers:
-      if m.match(topic, payload):
-        params = m.heartbeat(topic, payload)
+    for m in filter( lambda x: x.topic == topic, topics):
+      matches =  m.find_listeners(topic, payload)
+      if len(matches) > 0:
+        logging.info("find listeners output: " + str(matches))
+      for match in matches:
+        params = m.generate_heartbeat_params(match, topic, payload)
+        logging.info("Sending heartbeat for  - " + str(match))
         logging.info("Sending heartbeat - " + str(params))
         alertaClient.heartbeat(**params)
 
