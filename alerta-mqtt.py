@@ -1,17 +1,4 @@
-# curl -XPOST http://tower.local:8763/api/heartbeat -H 'Authorization: Key a7RtkQqM5PngVpmGnW4vb4hzBVZfBX3RZ6oMZiB8N9XUvJhuCNveNvbC5XvLhPF' -H 'Content-type: application/json' -d '{
-#       "origin": "cluster05",
-#       "timeout": 120,
-#       "tags": ["db05", "dc2"],
-#       "attributes": {
-#         "environment": "Production",
-#         "service": [
-#           "Core",
-#           "HA"
-#         ],
-#         "group": "Network",
-#         "severity": "major"
-#       }
-#     }'
+#!/usr/bin/env python3
 
 
 import argparse, yaml
@@ -23,14 +10,15 @@ import os
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
-import alertaclient
+from alertaclient.api import Client
+
+from matcher_factory import MatcherFactory
 
 
-
-ALERTA_ENDPOINT = os.getenv('ALERTA_ENDPOINT') if os.getenv('ALERTA_ENDPOINT') else "tower.local"
-ALERTA_PORT = os.getenv('ALERTA_PORT') if os.getenv('ALERTA_PORT') else "8763"
-ALERTA_API_KEY = os.getenv('ALERTA_API_KEY')
-MQTT_HOST = os.getenv('MQTT_HOST') if os.getenv('MQTT_HOST') else "tower.local"
+# ALERTA_ENDPOINT = os.getenv('ALERTA_ENDPOINT') if os.getenv('ALERTA_ENDPOINT') else "tower.local"
+# ALERTA_PORT = os.getenv('ALERTA_PORT') if os.getenv('ALERTA_PORT') else "8763"
+# ALERTA_API_KEY = os.getenv('ALERTA_API_KEY')
+MQTT_HOST = os.getenv('MQTT_HOST') if os.getenv('MQTT_HOST') else "mqtt"
 TOPIC = os.getenv('TOPIC') if os.getenv('TOPIC') else 'alerta/test'
 TEST_TOPIC = os.getenv('TEST_TOPIC') if os.getenv('TEST_TOPIC') else 'test'
 
@@ -38,42 +26,54 @@ TEST_TOPIC = os.getenv('TEST_TOPIC') if os.getenv('TEST_TOPIC') else 'test'
 
 
 # Logging
-logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S',
+logging.basicConfig(level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S',
                     format='%(asctime)-15s [%(levelname)s] %(module)s: %(message)s' )
 config = yaml.load(open("config.yaml"), Loader=yaml.CLoader)
 
-client = mqtt.Client()
+mqttClient = mqtt.Client()
 
-client.connect(MQTT_HOST, 1883, 60)
+logging.info("Hello")
+mqttClient.connect(MQTT_HOST, 1883, 60)
+
+alertaClient = Client()
+
+matchers = []
+factory = MatcherFactory()
+for topic, config in config["topics"].items():
+  logging.info( "Creating matcher: " + str(config))
+  matchers.append( factory.create(topic, config) )
 
 def on_connect(client, userdata, flags, rc):
     logging.info("Connected to MQTT broker with result code "+str(rc))
-    logging.info(config["topics"].keys())
-    for key in config["topics"].keys():
-      logging.info("Subscribing to %s " % (key))
-      client.subscribe(key)
+
+    for topic in matchers:
+      logging.info("Subscribing to %s " % (topic.topic))
+      mqttClient.subscribe(topic.topic)
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     topic = msg.topic
+    payload = msg.payload
+    logging.info("Message on %s : %s" % (topic, payload))
 
-    client = Client()
-    client.heartbeat(origin='baz')
+    for m in matchers:
+      if m.match(topic, payload):
+        params = m.heartbeat(topic, payload)
+        logging.info("Sending heartbeat - " + str(params))
+        alertaClient.heartbeat(**params)
 
-    if topic == MQTT_TEST_TOPIC:
-        client.publish(TEST_TOPIC  + "/result", payload=msg.payload, qos=0, retain=False)
-        return
-
-client.on_connect = on_connect
-client.on_message = on_message
+mqttClient.on_connect = on_connect
+mqttClient.on_message = on_message
 
 # Argument Parsing
 parser = argparse.ArgumentParser()
 args = parser.parse_args()
+while True:
+  mqttClient.loop()
 
 def exithandler(signal, frame):
-    client.disconnect()
+    mqttClient.disconnect()
     sys.exit(0)
 
 signal.signal(signal.SIGINT, exithandler)

@@ -1,5 +1,28 @@
 topics:
-  tele/son_tv/SENSOR:
+  tele/son_tv/LWT:
+    origin: son_tv
+    attributes:
+      group: sonoff
+      severity: low
+  tele/son_vintage_lamp/LWT:
+    origin: son_vintage_lamp
+    attributes:
+      group: sonoff
+      severity: low
+  home/gw/433toMQTT:
+    strategy:
+      type: json
+      attribute: value
+      value: 456
+    attributes:
+      group: sonoff
+      severity: low
+  home/gw/SYStoMQTT:
+    attributes:
+      group: hosts
+      severity: low
+  test:
     tags:
-      source: sonoffs
-    severity: low
+      group: test
+    attributes:
+      severity: low
