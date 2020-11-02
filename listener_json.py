@@ -16,7 +16,6 @@ class JsonListener(Listener):
     matches = []
     for l in self.listeners:
       payloadValue = j[self.config["attribute"]] 
-      logging.info("Checking listener - %s" % (l))
       if l.get('value') == payloadValue:
         logging.info("Listener matches - %s" % (l))
         matches.append(l)

@@ -15,12 +15,11 @@ class Listener:
       'attributes': self.config.get("attributes", dict()),
       'timeout': self.config.get("timeout", 24*3600)
     }
+    
     logging.info("Default config: " + str(default))
     
     hearbeat_global = self.config.get("heartbeat_global", dict())
     logging.info("hearbeat_global: " + str(hearbeat_global))
-
-    logging.info("match: " + str(match))
 
     match_config = match.get("heartbeat", dict())
     logging.info("match_config: " + str(match_config))

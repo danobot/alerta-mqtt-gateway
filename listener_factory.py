@@ -3,9 +3,7 @@ from listener_json import JsonListener
 import logging 
 class ListenerFactory:
   def create(self, topic, config):
-    logging.info(str(config))
     if "type" in config:
-      
       if config["type"] == "json":
         return JsonListener(topic, config)
 

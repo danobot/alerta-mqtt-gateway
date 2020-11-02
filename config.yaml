@@ -1,81 +1,81 @@
 ## how to handle devices with multiple buttons? 
 topics:
   # sonoffs
-  tele/son_tv/LWT:
-    origin: son_tv
-    timeout: 300
+  tele/son_tv_led/STATE:
+    origin: son_tv_led
+    timeout: 130
     tags:
       - sonoff
-  # tele/son_pow_dishwasher/LWT:
-  #   origin: son_pow_dishwasher
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_bedroom_lamp/LWT:
-  #   origin: son_bedroom_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_bedrom_led/LWT:
-  #   origin: son_bedrom_led
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_kitchen_led/LWT:
-  #   origin: son_kitchen_led
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_bedroom_fan/LWT:
-  #   origin: son_bedroom_fan
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_lr_fan/LWT:
-  #   origin: son_lr_fan
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_pow_lounge/LWT:
-  #   origin: son_pow_lounge
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_black_lamp/LWT:
-  #   origin: son_black_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_office_lamp/LWT:
-  #   origin: son_office_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_laundry_lamp/LWT:
-  #   origin: son_laundry_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_lr_table_lamp/LWT:
-  #   origin: son_lr_table_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_lounge_lamp/LWT:
-  #   origin: son_lounge_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_toilet_bulb/LWT:
-  #   origin: son_lounge_lamp
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
-  # tele/son_th_outside/LWT:
-  #   origin: son_th_outside
-  #   timeout: 300
-  #   tags:
-  #     - sonoff
+  tele/son_pow_dishwasher/STATE:
+    origin: son_pow_dishwasher
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_bedroom_lamp/STATE:
+    origin: son_bedroom_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_bedrom_led/STATE:
+    origin: son_bedrom_led
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_kitchen_led/STATE:
+    origin: son_kitchen_led
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_bedroom_fan/STATE:
+    origin: son_bedroom_fan
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_lr_fan/STATE:
+    origin: son_lr_fan
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_pow_lounge/STATE:
+    origin: son_pow_lounge
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_black_lamp/STATE:
+    origin: son_black_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_office_lamp/STATE:
+    origin: son_office_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_laundry_lamp/STATE:
+    origin: son_laundry_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_lr_table_lamp/STATE:
+    origin: son_lr_table_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_lounge_lamp/STATE:
+    origin: son_lounge_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_toilet_bulb/STATE:
+    origin: son_lounge_lamp
+    timeout: 130
+    tags:
+      - sonoff
+  tele/son_th_outside/STATE:
+    origin: son_th_outside
+    timeout: 130
+    tags:
+      - sonoff
 
 
   # Motion Sensors
@@ -91,22 +91,84 @@ topics:
           origin: mtn-living-room
           timeout: 604800
           tags: 
-            - motion_living_room
-      - value: 2011696976
+            - motion
+      - value: 13690522
         heartbeat:
-          origin: rc-1-on
-          timeout: 10
+          origin: mtn-living-room-secondary
+          timeout: 604800
           tags: 
-            - remote
+            - motion
+      - value: 12959178
+        heartbeat:
+          origin: mtn-kitchen
+          timeout: 604800
+          tags: 
+            - motion
+      - value: 144666
+        heartbeat:
+          origin: laundry_motion
+          timeout: 604800
+          tags: 
+            - motion
+      - value: 12783434
+        heartbeat:
+          origin: bedroom_motion
+          timeout: 604800
+          tags: 
+            - motion
+      - value: 9151402
+        heartbeat:
+          origin: backyard_motion
+          timeout: 604800
+          tags: 
+            - motion
+      - value: 15687562
+        heartbeat:
+          origin: mtn_outside_2
+          timeout: 604800
+          tags: 
+            - motion
+      - value: 7056844
+        heartbeat:
+          origin: mtn_lounge_2
+          timeout: 604800
+          tags: 
+            - motion
+      - value: 6271418
+        heartbeat:
+          origin: mtn_kitchen_2
+          timeout: 604800
+          tags: 
+            - motion
     heartbeat_global:
       timeout: 300
       origin: "RF Gateway"
+      tags:
+        - rf_gateway
 
 
-  # home/alarm:
-  #   origin: Alarm System
-  #   attributes:
-  #     group: service
+  home/alarm:
+    origin: Alarm System
+    attributes:
+      group: service
+
+  frigate/amcrest/person:
+    origin: Person Detection
+    tags:
+      - frigate
+    timeout: 86400
+    
+  frigate/amcrest/car:
+    origin: Person Detection
+    tags:
+      - frigate
+    timeout: 86400
+
+  frigate/amcrest/event/start:
+    origin: Event Detection
+    tags:
+      - frigate
+    timeout: 86400
   # test:
   #   tags:
   #     - test
