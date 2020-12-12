@@ -19,6 +19,8 @@ from listener_factory import ListenerFactory
 # ALERTA_PORT = os.getenv('ALERTA_PORT') if os.getenv('ALERTA_PORT') else "8763"
 # ALERTA_API_KEY = os.getenv('ALERTA_API_KEY')
 MQTT_HOST = os.getenv('MQTT_HOST') if os.getenv('MQTT_HOST') else "mqtt"
+MQTT_USERNAME = os.getenv('MQTT_USERNAME') if os.getenv('MQTT_USERNAME') else None
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD') if os.getenv('MQTT_PASSWORD') else None
 TOPIC = os.getenv('TOPIC') if os.getenv('TOPIC') else 'alerta/test'
 TEST_TOPIC = os.getenv('TEST_TOPIC') if os.getenv('TEST_TOPIC') else 'test'
 
@@ -32,7 +34,10 @@ config = yaml.load(open("config.yaml"), Loader=yaml.CLoader)
 
 mqttClient = mqtt.Client()
 
-logging.info("Hello")
+if MQTT_USERNAME:
+  logging.info("Authenticating to MQTT server.")
+  mqttClient.username_pw_set(MQTT_USERNAME, password=MQTT_PASSWORD)
+  
 mqttClient.connect(MQTT_HOST, 1883, 60)
 
 alertaClient = Client()
