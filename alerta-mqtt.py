@@ -18,6 +18,7 @@ from listener_factory import ListenerFactory
 # ALERTA_ENDPOINT = os.getenv('ALERTA_ENDPOINT') if os.getenv('ALERTA_ENDPOINT') else "tower.local"
 # ALERTA_PORT = os.getenv('ALERTA_PORT') if os.getenv('ALERTA_PORT') else "8763"
 # ALERTA_API_KEY = os.getenv('ALERTA_API_KEY')
+DEBUG = os.getenv('DEBUG') if os.getenv('DEBUG') else False
 MQTT_HOST = os.getenv('MQTT_HOST') if os.getenv('MQTT_HOST') else "mqtt"
 MQTT_USERNAME = os.getenv('MQTT_USERNAME') if os.getenv('MQTT_USERNAME') else None
 MQTT_PASSWORD = os.getenv('MQTT_PASSWORD') if os.getenv('MQTT_PASSWORD') else None
@@ -28,7 +29,8 @@ TEST_TOPIC = os.getenv('TEST_TOPIC') if os.getenv('TEST_TOPIC') else 'test'
 
 
 # Logging
-logging.basicConfig(level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S',
+log_level = logging.DEBUG if DEBUG else logging.INFO
+logging.basicConfig(level=log_level, datefmt='%Y-%m-%d %H:%M:%S',
                     format='%(asctime)-15s [%(levelname)s] %(module)s: %(message)s' )
 config = yaml.load(open("config.yaml"), Loader=yaml.CLoader)
 
