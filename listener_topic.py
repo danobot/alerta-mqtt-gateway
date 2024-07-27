@@ -7,7 +7,7 @@ class TopicListener(Listener):
     super().__init__(topic, config)
 
   def find_listeners(self, topic, payload):
-    logging.info("TopicListener - find_listeners :: START " + str(payload))
+    # logging.info("TopicListener - find_listeners :: START " + str(payload))
 
     if self.topic == topic:
       return [self.config]

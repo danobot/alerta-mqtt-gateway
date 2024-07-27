@@ -1,4 +1,4 @@
-## how to handle devices with multiple buttons? 
+# SAMPLE CONFIG - NOT IN USE
 topics:
   # sonoffs
   tele/son_tv_led/STATE:
@@ -67,7 +67,7 @@ topics:
     tags:
       - sonoff
   tele/son_toilet_bulb/STATE:
-    origin: son_lounge_lamp
+    origin: son_toilet_bulb
     timeout: 130
     tags:
       - sonoff
@@ -76,8 +76,21 @@ topics:
     timeout: 130
     tags:
       - sonoff
-
-
+  home/gw/BTtoMQTT/582D3438CA8E:
+    origin: mi_th_sensor
+    timeout: 900
+    tags:
+      - mi
+  # home/gw/BTtoMQTT/768FD9574D85:
+  #   origin: mi_bedroom_sensor
+  #   timeout: 900
+  #   tags:
+  #     - mi
+  #     home/gw/BTtoMQTT/582D3411D5E1:
+  #   origin: mi_kitchen_sensor
+  #   timeout: 900
+  #   tags:
+  #     - mi
   # Motion Sensors
 
 
@@ -140,6 +153,18 @@ topics:
           timeout: 604800
           tags: 
             - motion
+      - value: 10179082
+        heartbeat:
+          origin: ds-front-open
+          timeout: 86400
+          tags: 
+            - door
+      - value: 9069834
+        heartbeat:
+          origin: ds-kitchen-open
+          timeout: 86400
+          tags: 
+            - door
     heartbeat_global:
       timeout: 300
       origin: "RF Gateway"
@@ -152,25 +177,20 @@ topics:
     attributes:
       group: service
 
-  frigate/amcrest/person:
-    origin: Person Detection
-    tags:
-      - frigate
-    timeout: 86400
+  # frigate/amcrest/person:
+  #   origin: Person Detection
+  #   tags:
+  #     - frigate
+  #   timeout: 86400
     
-  frigate/amcrest/car:
-    origin: Person Detection
-    tags:
-      - frigate
-    timeout: 86400
+  # frigate/amcrest/car:
+  #   origin: Person Detection
+  #   tags:
+  #     - frigate
+  #   timeout: 86400
 
   frigate/amcrest/event/start:
     origin: Event Detection
     tags:
       - frigate
     timeout: 86400
-  # test:
-  #   tags:
-  #     - test
-  #   attributes:
-  #     severity: low

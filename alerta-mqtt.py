@@ -29,7 +29,7 @@ TEST_TOPIC = os.getenv('TEST_TOPIC') if os.getenv('TEST_TOPIC') else 'test'
 
 
 # Logging
-log_level = logging.DEBUG if DEBUG else logging.INFO
+log_level = logging.DEBUG if DEBUG else logging.ERROR
 logging.basicConfig(level=log_level, datefmt='%Y-%m-%d %H:%M:%S',
                     format='%(asctime)-15s [%(levelname)s] %(module)s: %(message)s' )
 config = yaml.load(open("config.yaml"), Loader=yaml.CLoader)
@@ -62,18 +62,21 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     topic = msg.topic
     payload = msg.payload
-    logging.info("Message on %s : %s" % (topic, payload))
+    logging.debug("Message on %s : %s" % (topic, payload))
 
     for m in filter( lambda x: x.topic == topic, topics):
       matches =  m.find_listeners(topic, payload)
       if len(matches) > 0:
-        logging.info("find listeners output: " + str(matches))
+        pass
+        # logging.info("find listeners output: " + str(matches))
       for match in matches:
         params = m.generate_heartbeat_params(match, topic, payload)
-        logging.info("Sending heartbeat for  - " + str(match))
-        logging.info("Sending heartbeat - " + str(params))
-        alertaClient.heartbeat(**params)
-
+        logging.debug("Sending heartbeat for  - " + str(match))
+        try:
+          logging.debug("Sending heartbeat - " + str(params))
+          alertaClient.heartbeat(**params)
+        except Exception as e:
+          logging.error(e)
 mqttClient.on_connect = on_connect
 mqttClient.on_message = on_message
 
