@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-
-import argparse, yaml
+import argparse
+import yaml
 import signal
 import sys
 import time
@@ -11,22 +11,14 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
 from alertaclient.api import Client
-
 from listener_factory import ListenerFactory
 
-
-# ALERTA_ENDPOINT = os.getenv('ALERTA_ENDPOINT') if os.getenv('ALERTA_ENDPOINT') else "tower.local"
-# ALERTA_PORT = os.getenv('ALERTA_PORT') if os.getenv('ALERTA_PORT') else "8763"
-# ALERTA_API_KEY = os.getenv('ALERTA_API_KEY')
 DEBUG = os.getenv('DEBUG') if os.getenv('DEBUG') else False
 MQTT_HOST = os.getenv('MQTT_HOST') if os.getenv('MQTT_HOST') else "mqtt"
 MQTT_USERNAME = os.getenv('MQTT_USERNAME') if os.getenv('MQTT_USERNAME') else None
 MQTT_PASSWORD = os.getenv('MQTT_PASSWORD') if os.getenv('MQTT_PASSWORD') else None
 TOPIC = os.getenv('TOPIC') if os.getenv('TOPIC') else 'alerta/test'
 TEST_TOPIC = os.getenv('TEST_TOPIC') if os.getenv('TEST_TOPIC') else 'test'
-
-
-
 
 # Logging
 log_level = logging.DEBUG if DEBUG else logging.ERROR
@@ -47,7 +39,7 @@ alertaClient = Client()
 topics = []
 factory = ListenerFactory()
 for topic, config in config["topics"].items():
-  logging.info( "Creating listener: " + str(config))
+  logging.info("Creating listener: " + str(config))
   topics.append( factory.create(topic, config) )
 
 def on_connect(client, userdata, flags, rc):
@@ -57,18 +49,16 @@ def on_connect(client, userdata, flags, rc):
       logging.info("Subscribing to %s " % (topic.topic))
       mqttClient.subscribe(topic.topic)
 
-
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     topic = msg.topic
     payload = msg.payload
     logging.debug("Message on %s : %s" % (topic, payload))
 
-    for m in filter( lambda x: x.topic == topic, topics):
+    for m in filter(lambda x: x.topic == topic, topics):
       matches =  m.find_listeners(topic, payload)
       if len(matches) > 0:
         pass
-        # logging.info("find listeners output: " + str(matches))
       for match in matches:
         params = m.generate_heartbeat_params(match, topic, payload)
         logging.debug("Sending heartbeat for  - " + str(match))
@@ -77,17 +67,24 @@ def on_message(client, userdata, msg):
           alertaClient.heartbeat(**params)
         except Exception as e:
           logging.error(e)
+
 mqttClient.on_connect = on_connect
 mqttClient.on_message = on_message
 
 # Argument Parsing
 parser = argparse.ArgumentParser()
 args = parser.parse_args()
-while True:
-  mqttClient.loop()
+
+def main_loop():
+    while True:
+        mqttClient.loop()
+        time.sleep(0.1)  # Add a small sleep to reduce CPU usage
 
 def exithandler(signal, frame):
     mqttClient.disconnect()
     sys.exit(0)
 
 signal.signal(signal.SIGINT, exithandler)
+
+if __name__ == "__main__":
+    main_loop()
